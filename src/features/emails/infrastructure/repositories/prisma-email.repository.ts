@@ -26,22 +26,31 @@ export class PrismaEmailRepository implements EmailRepository {
     emailId: string,
     status: 'pending' | 'delivery' | 'failed',
   ): Promise<void> {
+    const existingEmail = await this.prisma.email.findUnique({
+      where: { emailId: emailId },
+    });
+
+    if (!existingEmail) {
+      throw new Error(`Email with ID ${emailId} not found`);
+    }
+
     await this.prisma.email.update({
-      where: { emailId },
+      where: { emailId: emailId },
       data: { status, updatedAt: new Date() },
     });
   }
 
   async getEmailById(emailId: string): Promise<EmailEntity | null> {
     const email = await this.prisma.email.findUnique({
-      where: { emailId },
+      where: { emailId: emailId },
     });
 
     if (!email) {
-      throw new Error('Email not found');
+      return null;
     }
+
     return new EmailEntity(
-      email.id,
+      email.emailId as string,
       email.to,
       email.subject,
       email.template,

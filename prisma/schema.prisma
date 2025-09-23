@@ -9,7 +9,7 @@ datasource db {
 
 model Email {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  emailId   String   @unique
+  emailId   String   @unique @default(uuid())
   to        String
   subject   String
   template  String
