@@ -1,58 +1,107 @@
-# API Transactional: Servicio de envío de correos electrónicos transaccionales y masivos
+# 📧 Bulk Email Scheduler
 
-API Transactional es un servicio backend desarrollado en Node.js con TypeScript, diseñado para gestionar el envío de correos electrónicos transaccionales y masivos. Utiliza BullMQ para la gestión de colas de trabajo y Redis como almacén de datos en memoria, asegurando un procesamiento eficiente y escalable de los correos electrónicos.
+Servicio backend para **programar y encolar envíos masivos de correos** de forma escalable.  
+Construido con **Node.js / TypeScript**, siguiendo principios de **DDD** y usando **Redis** como motor de colas (BullMQ).
 
-## Características Principales
+---
 
-- **Envío de Correos Electrónicos**: Soporte para el envío de correos electrónicos individuales y masivos.
-- **Gestión de Colas**: Implementación de BullMQ para manejar colas de trabajo, permitiendo el procesamiento asíncrono de tareas.
-- **Almacenamiento en Memoria**: Uso de Redis para almacenar temporalmente los correos electrónicos antes de su envío.
-- **Plantillas de Correo**: Soporte para plantillas de correo electrónico utilizando Handlebars.
-- **API RESTful**: Endpoints para programar y gestionar el envío de correos electrónicos.
-- **Manejo de Errores y Reintentos**: Estrategias de reintento para correos electrónicos fallidos, mejorando la fiabilidad del servicio.
+## ✨ Características
 
-## Tecnologías Utilizadas
+- **Envío masivo (bulk)**: soporta miles de correos por lote.
+- **Envío individual**: endpoint para mandar un correo por request.
+- **Programación (cronjobs)**: dispara procesos masivos en horarios específicos.
+- **Persistencia**: guarda estado de los correos en base de datos.
+- **Escalabilidad**: integración con Redis/BullMQ para manejar colas distribuidas.
+- **Resiliencia**: reintentos automáticos y backoff exponencial para jobs fallidos.
+- **Extensible**: fácil de acoplar a cualquier proveedor SMTP/API (SendGrid, Resend, SES, etc.).
 
-- Node.js
-- TypeScript
-- BullMQ
-- Redis
-- Handlebars
-- NestJS
-- Resend
+---
 
-## Instalación y Configuración
+## 🛠️ Tecnologías
+
+- [NestJS](https://nestjs.com/) — framework backend
+- [BullMQ](https://docs.bullmq.io/) — colas de trabajos en Redis
+- [Redis](https://redis.io/) — almacenamiento de jobs
+- [Winston](https://github.com/winstonjs/winston) — logging estructurado
+- [TypeScript](https://www.typescriptlang.org/) — tipado fuerte
+
+---
+
+## 🚀 Instalación
 
 1. Clona el repositorio:
    ```bash
-   git clone kkfrr/api-transactional.git
-    cd api-transactional
+   git clone https://github.com/<tu-org>/bulk-email-scheduler.git
+   cd bulk-email-scheduler
    ```
-2. Instala las dependencias:
-   ```bash
-    npm install
-   ```
-3. Configura las variables de entorno en un archivo `.env` basado en el archivo `.env.example`.
-4. Inicia el servidor:
-   ```bash
-    npm run start:dev
-   ```
+2. Instala dependencias:
 
-## Uso
+```bash
+npm install
+```
 
-- Accede a la documentación de la API en `http://localhost:3000/api` para explorar los endpoints disponibles.
-- Utiliza los endpoints para programar el envío de correos electrónicos individuales o masivos.
+3. Crea un archivo .env con tus variables:
 
-## Contribución
+```bash
+DATABASE_URL="connection_string_a_tu_base_de_datos"
+PORT=3000
+REDIS_HOST=localhost
+RESEND_FROM_EMAIL="Tu Nombre <noreply@domain.com>"
+RESEND_API_KEY="re_tu_api_key_aqui"
+EMAIL_TEMPLATES_PATH="src/templates/emails"
+```
 
-- Si deseas contribuir al proyecto, por favor abre un issue o envía un pull request con tus mejoras o correcciones.
+4. Levanta Redis (ejemplo con Docker):
 
-## Licencia
+```bash
+docker run -d --name redis -p 6379:6379 redis:7
+```
 
-- Este proyecto está licenciado bajo la Licencia MIT. Consulta el archivo LICENSE para más detalles.
+5. Arranca el servicio:
 
-## Contacto
+```bash
+npm run start:dev
+```
 
-- Para preguntas o soporte, por favor contacta a
-  - Nombre: Kevin Hernandez Crespo
-  - Email: kevinhernandezcrespo97@gmail.com
+---
+
+## 📡 Endpoints
+
+### Enviar correo único
+
+POST /emails/send-one
+Content-Type: application/json
+
+```json
+{
+  "id": "123",
+  "to": "test@example.com",
+  "subject": "Hola!",
+  "template": "welcome",
+  "vars": { "name": "Kevin" }
+}
+```
+
+### Enviar correos en bulk
+
+POST /emails/send-bulk
+Content-Type: application/json
+
+```json
+[
+  {
+    "id": "bulk-1",
+    "to": "user1@example.com",
+    "subject": "Promo",
+    "template": "promo",
+    "vars": { "discount": "20%" }
+  },
+  {
+    "id": "bulk-2",
+    "to": "user2@example.com",
+    "subject": "Promo",
+    "template": "promo",
+    "vars": { "discount": "20%" }
+  }
+]
+```
