@@ -27,10 +27,22 @@ export class ScheduleSingleEmailUseCase {
 
     await this.emailRepo.save(entity);
 
-    await this.jobQueue.add('sendEmail', {
-      emailId: entity.emailId,
-    });
+    await this.jobQueue.add(
+      'sendEmail',
+      {
+        emailId: entity.emailId,
+      },
+      {
+        attempts: 5,
+        backoff: { type: 'exponential', delay: 5000 },
+        removeOnComplete: {
+          age: 3600,
+          count: 5000,
+        },
+        removeOnFail: { age: 24 * 3600 },
+      },
+    );
 
-    return { success: true };
+    return { success: true, emailId: entity.emailId };
   }
 }

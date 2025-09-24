@@ -18,7 +18,6 @@ export class ScheduleBulkEmailsUseCase {
       vars: Record<string, any>;
     }[],
   ) {
-    // 1. Crear todas las entidades
     const entities = emails.map(
       (e) =>
         new EmailEntity(
@@ -33,20 +32,26 @@ export class ScheduleBulkEmailsUseCase {
         ),
     );
 
-    // 2. Guardar en DB en bloques de 500
     const entityChunks = chunk(entities, 500);
     for (const c of entityChunks) {
       await this.emailRepo.saveMany(c);
     }
 
-    // 3. Encolar jobs en bloques
     const jobChunks = chunk(emails, 1000);
     for (const c of jobChunks) {
       await this.jobQueue.addBulk(
         c.map((e) => ({
           name: 'sendEmail',
           data: { emailId: e.id },
-          opts: { attempts: 3, backoff: { type: 'exponential', delay: 3000 } },
+          opts: {
+            attempts: 5,
+            backoff: { type: 'exponential', delay: 5000 },
+            removeOnComplete: {
+              age: 3600,
+              count: 5000,
+            },
+            removeOnFail: { age: 24 * 3600 },
+          },
         })),
       );
     }
