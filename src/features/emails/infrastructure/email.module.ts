@@ -8,6 +8,7 @@ import { EmailProcessor } from '@/features/emails/infrastructure/processors/emai
 import { ScheduleBulkEmailsUseCase } from '@/features/emails/application/use-cases/schedule-bulk-emails.usecase';
 import { PrismaModule } from '@/common/database/prisma.module';
 import { EmailRepository } from '@/features/emails/domain/repositories/email.repository';
+import { ScheduleSingleEmailUseCase } from '@/features/emails/application/use-cases/schedule-single-email.usecase';
 
 @Module({
   imports: [BullModule.registerQueue({ name: 'email' }), PrismaModule],
@@ -25,6 +26,12 @@ import { EmailRepository } from '@/features/emails/domain/repositories/email.rep
       provide: ScheduleBulkEmailsUseCase,
       useFactory: (repo: EmailRepository, queue: BullmqJobQueue) =>
         new ScheduleBulkEmailsUseCase(repo, queue),
+      inject: ['EmailRepository', BullmqJobQueue],
+    },
+    {
+      provide: ScheduleSingleEmailUseCase,
+      useFactory: (repo: EmailRepository, queue: BullmqJobQueue) =>
+        new ScheduleSingleEmailUseCase(repo, queue),
       inject: ['EmailRepository', BullmqJobQueue],
     },
     EmailProcessor,

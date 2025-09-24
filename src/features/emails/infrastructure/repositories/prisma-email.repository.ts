@@ -60,4 +60,21 @@ export class PrismaEmailRepository implements EmailRepository {
       email.updatedAt,
     );
   }
+
+  async saveMany(emails: EmailEntity[]): Promise<void> {
+    const data = emails.map((email) => ({
+      emailId: email.emailId,
+      to: email.to,
+      subject: email.subject,
+      template: email.template,
+      status: email.status,
+      variables: email.variables,
+      createdAt: email.createdAt,
+      updatedAt: email.updatedAt,
+    }));
+
+    await this.prisma.email.createMany({
+      data,
+    });
+  }
 }

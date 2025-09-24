@@ -33,4 +33,5 @@ export interface EmailRepository {
     status: 'pending' | 'delivery' | 'failed',
   ): Promise<void>;
   getEmailById(emailId: string): Promise<EmailEntity | null>;
+  saveMany(emails: EmailEntity[]): Promise<void>;
 }

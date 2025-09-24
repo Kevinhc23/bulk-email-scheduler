@@ -10,4 +10,14 @@ export class BullmqJobQueue implements JobQueue {
   async add(jobName: string, payload: any, options?: any): Promise<void> {
     await this.queue.add(jobName, payload, options);
   }
+
+  async addBulk(
+    jobs: {
+      name: string;
+      data: Record<string, any>;
+      opts?: Record<string, any>;
+    }[],
+  ): Promise<void> {
+    await this.queue.addBulk(jobs);
+  }
 }
