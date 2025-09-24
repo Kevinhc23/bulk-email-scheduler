@@ -105,3 +105,15 @@ Content-Type: application/json
   }
 ]
 ```
+
+---
+
+## 📝 Licencia
+
+MIT License. See LICENSE file for details.
+
+---
+
+Created by [Kevin Hernandez](https://www.linkedin.com/in/kevinhc23/).
+
+_Last updated: September 2025_
