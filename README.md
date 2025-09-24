@@ -108,9 +108,15 @@ Content-Type: application/json
 
 ---
 
-## 📝 Licencia
+## Contributing
 
-MIT License. See LICENSE file for details.
+Contributions are welcome! If you find a bug or want to add a new feature, please open an issue or submit a pull request.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for
+details.
+more information.
 
 ---
 
